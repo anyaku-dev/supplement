@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d1117">
+<title>MY SUPP LAB - 男の活力爆上げダッシュボード</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --card2:#1c232d; --line:#2d3542;
+    --txt:#e6edf3; --sub:#9aa7b4; --accent:#ff5a1f; --accent2:#ffb020;
+    --green:#3fb950; --yellow:#d29922; --red:#f85149; --blue:#58a6ff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Sans","Noto Sans JP",sans-serif;
+    padding-bottom:82px;line-height:1.55;}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(135deg,#1a1005,#0d1117);
+    border-bottom:1px solid var(--line);padding:14px 16px 10px;}
+  header h1{margin:0;font-size:19px;letter-spacing:.5px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800;}
+  header .sub{font-size:11px;color:var(--sub);margin-top:2px;}
+  .wrap{padding:14px;max-width:640px;margin:0 auto;}
+
+  .hero{background:linear-gradient(135deg,#2a1505,#161b22);border:1px solid var(--line);
+    border-radius:16px;padding:16px;margin-bottom:14px;text-align:center;}
+  .hero .flame{font-size:34px;}
+  .hero .big{font-size:42px;font-weight:900;color:var(--accent2);line-height:1;}
+  .hero .lbl{font-size:12px;color:var(--sub);margin-top:4px;}
+  .hero .msg{margin-top:10px;font-size:13px;color:var(--accent2);font-weight:600;}
+  .prog{height:9px;background:#0d1117;border-radius:6px;margin-top:12px;overflow:hidden;border:1px solid var(--line);}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:.4s;}
+
+  .timeblock{margin-bottom:16px;}
+  .timeblock h2{font-size:14px;margin:0 0 4px;display:flex;align-items:center;gap:8px;}
+  .timeblock h2 .ico{font-size:18px;}
+  .timegoal{font-size:11px;color:var(--accent2);margin:0 0 8px 2px;}
+
+  .item{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:12px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;transition:.15s;cursor:pointer;}
+  .item.done{opacity:.55;border-color:var(--green);}
+  .chk{flex:0 0 26px;height:26px;border-radius:50%;border:2px solid var(--sub);
+    display:flex;align-items:center;justify-content:center;font-size:15px;margin-top:2px;transition:.15s;}
+  .item.done .chk{background:var(--green);border-color:var(--green);color:#fff;}
+  .it-main{flex:1;min-width:0;}
+  .it-name{font-weight:700;font-size:15px;}
+  .it-dose{font-size:12px;color:var(--accent2);margin-top:1px;}
+  .it-hook{font-size:12.5px;color:#d7dee6;margin-top:6px;}
+  .tapmore{font-size:10.5px;color:var(--sub);margin-top:6px;}
+  .stock{font-size:11px;margin-top:6px;color:var(--sub);}
+  .stock.low{color:var(--red);font-weight:700;}
+
+  nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);
+    display:flex;z-index:20;padding-bottom:env(safe-area-inset-bottom);}
+  nav button{flex:1;background:none;border:none;color:var(--sub);padding:10px 0 12px;font-size:10px;cursor:pointer;}
+  nav button.on{color:var(--accent2);}
+  nav button .ni{display:block;font-size:20px;margin-bottom:2px;}
+  .page{display:none;} .page.on{display:block;}
+
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;display:none;align-items:flex-end;}
+  .modal.on{display:flex;}
+  .sheet{background:var(--card);width:100%;max-width:640px;margin:0 auto;border-radius:18px 18px 0 0;
+    max-height:90vh;overflow-y:auto;padding:18px 18px 44px;border:1px solid var(--line);}
+  .sheet h3{margin:4px 0 2px;font-size:21px;}
+  .sheet .close{float:right;font-size:24px;color:var(--sub);cursor:pointer;line-height:1;}
+  .hookbox{background:linear-gradient(135deg,#2a1505,#1c232d);border:1px solid var(--accent);
+    border-radius:12px;padding:13px;margin-top:12px;font-size:14px;color:#ffe;line-height:1.65;}
+  .hookbox .tag{font-size:10px;font-weight:800;color:var(--accent2);letter-spacing:1px;display:block;margin-bottom:6px;}
+  .sec{margin-top:16px;}
+  .sec h4{font-size:12px;margin:0 0 6px;letter-spacing:.5px;padding-left:8px;border-left:3px solid var(--line);}
+  .sec p{margin:0 0 8px;font-size:13px;color:#cdd6df;}
+  .box{font-size:12.5px;color:#cdd6df;background:var(--card2);border-radius:8px;padding:11px;line-height:1.65;}
+  .box.pos{border-left:3px solid var(--green);}
+  .box.neg{border-left:3px solid var(--red);}
+  .box.warn{border-left:3px solid var(--yellow);background:rgba(210,153,34,.08);}
+  .h-pos{color:var(--green);border-left-color:var(--green)!important;}
+  .h-neg{color:var(--red);border-left-color:var(--red)!important;}
+  .h-warn{color:var(--yellow);border-left-color:var(--yellow)!important;}
+  .stepper{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;}
+  .stepper button{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);font-size:18px;cursor:pointer;}
+  .stepper span{font-size:18px;font-weight:700;min-width:46px;text-align:center;}
+
+  .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .statcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;}
+  .statcard .n{font-size:26px;font-weight:900;color:var(--accent2);}
+  .statcard .l{font-size:11px;color:var(--sub);margin-top:2px;}
+  .listrow{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    margin-bottom:6px;display:flex;justify-content:space-between;font-size:13px;}
+  .listrow b{color:var(--accent2);}
+  .note{font-size:11px;color:var(--sub);background:var(--card2);border:1px solid var(--line);
+    border-radius:10px;padding:12px;margin-top:16px;line-height:1.7;}
+  .btn{display:block;width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);font-size:13px;margin-top:10px;cursor:pointer;}
+  .synergy{background:linear-gradient(135deg,#2a1505,#161b22);border:1px solid var(--line);
+    border-radius:12px;padding:14px;margin-bottom:12px;font-size:12.5px;line-height:1.7;}
+  .synergy b{color:var(--accent2);}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔥 MY SUPP LAB</h1>
+  <div class="sub">30歳・174cm・75kg / 男の活力爆上げプログラム 完全最適化版</div>
+</header>
+
+<div class="wrap">
+
+  <div class="page on" id="page-today">
+    <div class="hero">
+      <div class="flame">🔥</div>
+      <div class="big" id="streakNum">0</div>
+      <div class="lbl">日連続 継続中</div>
+      <div class="prog"><i id="todayProg"></i></div>
+      <div class="msg" id="motivMsg">さあ、今日も男のポテンシャルを限界まで解放しよう。</div>
+    </div>
+    <div id="todayList"></div>
+  </div>
+
+  <div class="page" id="page-lib">
+    <div class="synergy">
+      <b>🔥 攻めた実感ポイント（コンボ効果）</b><br><br>
+      <b>性的領域：</b>Tongkat Ali + Zinc + Arginine + Tribulus の組み合わせで、テストステロン上昇・NO増加・精子質向上により「ムラムラが自然に湧き、硬度・持続力・精液量」が変化しやすい。活力と自信からくる“色気”の二次効果も期待大。<br><br>
+      <b>筋トレ：</b>Creatine + Beta-Alanine + Gamma Oryzanol + Arginine でパンプが異常。筋肉が張り、血管が浮き出る感覚。<br><br>
+      <b>精神・エネルギー：</b>Ashwagandha + Theanine + Bacopa でストレス耐性↑、クリエイティブ脳活性。体の奥から熱いエネルギーが湧く。<br><br>
+      <b>全体：</b>Vitamin D + Magnesium + Zinc で基礎を固め、睡眠の質が上がると朝のギンギンエネルギーが持続。
+    </div>
+    <div id="libList"></div>
+    <div class="note">
+      <b>追加アドバイス</b><br>
+      ・銅対策：Zinc を飲む日は無糖ココア大さじ1〜2杯 or 別途銅サプリ。<br>
+      ・サイクル：8〜12週間継続 → 1〜2週間軽め休養を挟む。<br>
+      ・生活連携：高タンパク食事（150g/日目安）、十分な睡眠、適度な有酸素で効果倍増。<br>
+      ・注意：効果は個人差あり。最初は量を抑えて体感確認を。異常時は即中止。<br><br>
+      ⚠️ Tongkat Ali・Tribulus・Zinc 30mg長期併用は、開始前に一度、血液検査（テストステロン/肝機能/亜鉛・銅）と医師・薬剤師への相談を推奨。
+    </div>
+  </div>
+
+  <div class="page" id="page-stock">
+    <h2 style="font-size:15px;">📦 在庫管理</h2>
+    <div id="stockList"></div>
+  </div>
+
+  <div class="page" id="page-stats">
+    <h2 style="font-size:15px;">📊 今月のサマリー</h2>
+    <div class="statgrid" id="statGrid"></div>
+    <h2 style="font-size:15px;margin-top:20px;">💊 今月の摂取量（合計）</h2>
+    <div id="monthAmount"></div>
+    <button class="btn" onclick="resetToday()">今日のチェックをリセット</button>
+    <button class="btn" onclick="if(confirm('全データを消去しますか？')){localStorage.clear();location.reload();}">全データ初期化</button>
+  </div>
+
+</div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<nav>
+  <button class="on" data-p="today" onclick="nav('today',this)"><span class="ni">☀️</span>今日</button>
+  <button data-p="lib" onclick="nav('lib',this)"><span class="ni">📚</span>効果図鑑</button>
+  <button data-p="stock" onclick="nav('stock',this)"><span class="ni">📦</span>在庫</button>
+  <button data-p="stats" onclick="nav('stats',this)"><span class="ni">📊</span>記録</button>
+</nav>
+
+<script>
+/* ===================== DATA ===================== */
+/* hook = 気合スイッチ（前向き・プラシーボ全開）
+   detail       = これは何？
+   evidencePos  = エビデンス（前向き）※厚め
+   evidenceNeg  = エビデンス（悲観）
+   reviews      = レビュー傾向
+   usage        = 効かせ方・使い方
+   caution      = 注意点 */
+const SUPPS = [
+  {id:"vitd", name:"Vitamin D3", dose:"2,000IU (1000IU×2粒)", pills:2, time:["morning"],
+   hook:"日本人男性の“隠れ不足NO.1”栄養素。テストステロン合成に直結し、朝の活力・免疫・骨密度・気分を根っこから底上げ。不足が解消された瞬間、朝から「男のスイッチ」がカチッと入り、1日を通してエネルギーが切れにくくなる。全サプリの効果を支える“土台の土台”がこれだ。",
+   detail:"体内でホルモンのように働く脂溶性ビタミン。ビタミンD受容体は精巣を含む全身に存在し、テストステロン合成・免疫・骨代謝・気分に関与する土台の栄養素。",
+   evidencePos:"欠乏している人（血中25(OH)D<20〜30ng/mL）が補うと、総テストステロン・活力・気分の改善が複数の研究で報告されている。ビタミンDと血中テストステロンの正の相関を示す観察研究も多く、特に欠乏者・高齢者では補正で数値が上がる報告あり。免疫・骨密度・抑うつ気分への効果は裏付けが厚く、冬季に不足しやすい日本人男性にとって「まず埋めるべき土台」としての価値が非常に高い。",
+   evidenceNeg:"すでに充足している人が上乗せで飲んでも、テストステロンは有意に上がらないというのが総説の結論。つまり“不足補正型”であり、足りている人の万能ブースターではない。",
+   reviews:"「冬のだるさ・気分の落ち込みが軽くなった」「血液検査で数値が正常化してから調子が良い」という声が多数。体感は地味だが土台として評価が高い。",
+   usage:"脂溶性なので朝食（脂質を含む食事）と一緒が吸収◎。K2やマグネシウムと相性が良い。可能なら年1回、血中25(OH)Dを測って自分の必要量を把握するのがベスト。",
+   caution:"上限の目安は4,000IU/日（今の2,000IUは安全域）。長期の高用量・自己判断の大量摂取は高カルシウム血症のリスク。サプリを複数併用して総量が増えすぎないよう注意。腎疾患・サルコイドーシスがある人は医師に相談を。"},
+
+  {id:"crea", name:"Creatine Monohydrate", dose:"5g（標準）〜7g（攻め）", pills:1, time:["morning"],
+   hook:"サプリ界の“絶対王者”。筋肉のATPを直接チャージし、筋トレ時のパンプが異常なほど強くなる。筋繊維がパンパンに膨張し、扱える重量が伸び、長期で筋肉量・パワーが確実に積み上がる。さらに脳のエネルギー代謝にも効いて集中力・思考のキレまで上がる。“飲まない理由がない”一粒。",
+   detail:"筋肉のクレアチンリン酸を増やし、短時間高強度運動でのATP再合成を加速。細胞内に水を引き込み筋のボリューム感（セルボリューマイズ）も出す。最も研究され尽くしたサプリの一つ。",
+   evidencePos:"数百件のRCTで筋力・パワー・除脂肪量の向上が確立された、サプリ界で最強クラスのエビデンス。効果の再現性・安全性ともに極めて高い。近年は認知面、特に睡眠不足時の作業記憶・処理速度の改善も示されつつあり、“脳のサプリ”としての評価も上昇中。長期使用の安全性データも豊富で、コスパ・実感・信頼性の三拍子が揃った数少ないサプリ。",
+   evidenceNeg:"体重が1〜2kg増える（主に水分保持）ため、階級制競技や見た目の絞りを重視する時期は好みが分かれる。ごく一部にレスポンダー差（体内貯蔵が元々高く体感しにくい人）がある。",
+   reviews:"「2〜3週間で明らかに扱える重量が上がった」「体重が増えるが見た目がパンプして満足」「頭のクリアさが増した気がする」。効果を体感しやすく評価は非常に高い。",
+   usage:"標準は3〜5g/日を毎日（タイミング不問、飲み忘れ防止で朝ルーティン化◎）。早く飽和させたければローディングとして20g/日を4〜5回に分け5〜7日→以降3〜5g維持。あなたの体格なら5g維持で十分、攻めるなら7g。水分は多めに。",
+   caution:"健康な腎臓であれば推奨用量で安全というのが大勢の見解。ただし腎疾患・その既往がある人は事前に医師相談を。水分保持作用があるので水をしっかり摂る。まれに胃部不快感・軽い下痢（一度に大量摂取した時）。粗悪品を避け純度の高いモノハイドレートを選ぶ。"},
+
+  {id:"tongkat", name:"Tongkat Ali", dose:"400〜800mg（1〜2粒）", pills:2, time:["morning"],
+   hook:"東南アジア伝統の「天然バイアグラ級」ハーブ。テストステロン・フリーTEST上昇、リビドー激増、精子量・運動率アップを狙う“男の切り札”。朝飲むと日中に自然とムラムラが湧き、活力と自信がみなぎって、まとう色気まで変わってくる。ストレスに強くなり、動じないメンタルも手に入る万能ハーブだ。",
+   detail:"マレーシア原産（Eurycoma longifolia）。有効成分エウリコマノンがSHBGからの遊離テストステロンを増やし、コルチゾールを下げる方向に働くとされるアダプトゲン兼テストサポートハーブ。",
+   evidencePos:"複数の臨床試験・メタ分析で、テストステロン上昇・勃起機能改善・ストレス指標（コルチゾール低下）・気分改善が報告されている“有望株”。ある系統的レビューでは対象研究の多くで総テストステロンの有意な改善が見られ、6ヶ月のRCTでは勃起機能とテストステロンがともに向上。ボディコンポジションやストレスホルモン改善を示す最近の試験もあり、アダプトゲンとしての実力は着実に裏付けが増えている。“天然由来でこれだけ多面的なデータがある”点は大きな魅力。",
+   evidenceNeg:"研究ごとに規格・用量・抽出物の質のばらつきが大きく、まだ「確立」とは言えない段階。効くとしても効果量は中程度で、無反応の人もいる。数値の劇変を過度に期待しないのが現実的で、規格化された品質のよい製品選びが結果を左右する。",
+   reviews:"賛否が分かれる。「1週間でリビドーが跳ね上がった、朝の調子が違う」という強い体感派と、「エネルギーは上がったが性欲は変化なし」「何も感じない」という無反応派が両方多い。抗うつ・気分安定を挙げる声も。",
+   usage:"朝の空腹〜食後に。効果発現に2〜4週かかることが多い。サイクル運用（数週continued→休薬）推奨。血圧・睡眠への影響を見ながら量を調整。エウリコマノン含有%が表示された規格品を選ぶと差が出やすい。",
+   caution:"高用量では不眠・イライラを起こすことがある（朝摂取が無難）。稀に肝機能への影響が報告された症例あり——長期併用なら定期的に肝機能をチェック。肝酵素で代謝される薬（一部の降圧薬など）と理論上の相互作用の可能性。ホルモン感受性疾患のある人、薬を服用中の人は事前に医師・薬剤師へ相談を。"},
+
+  {id:"tribulus", name:"Tribulus 750", dose:"750〜1,500mg（1〜2粒）", pills:2, time:["morning"],
+   hook:"Tongkatと組ませてテストステロン・LHホルモンをサポートする“相乗ブースター”。活力・勃起力・筋トレパフォーマンスを後押しし、コンボ全体の底上げ役として朝のスタックを完成させる一粒。飲むこと自体が「今日も攻める」というスイッチになる。",
+   detail:"ハマビシ科の伝統ハーブ。サポニン（プロトジオシン）が有効成分とされ、古くからテストブースターとして売られてきた定番。",
+   evidencePos:"スポーツパフォーマンス（筋持久力・回復感）を改善したとする試験がいくつかあり、主観的なリビドー・活力の向上を報告する研究や体感も多い。伝統医学での使用歴が長く、抗酸化作用や気分の後押しといった側面も期待される。コンボの“気合を入れる一員”としての価値がある。",
+   evidenceNeg:"正直ベースで、ヒト試験ではテストステロンを有意に上げる明確な証拠は乏しい（動物では上昇報告あり）。勃起機能改善についても系統的レビューではエビデンスは低レベルという評価。“テストを直接上げる”効果は期待しすぎないのが賢明で、体感がなければ優先度は下げてよい枠。",
+   reviews:"「性欲は上がった気がする」というポジティブ体感と、「血液検査ではテストに変化なし」という客観否定が混在。主観的リビドーへの言及が多い一方、筋力への明確効果を挙げる声は少なめ。",
+   usage:"Tongkatとの併用枠。効果が体感できなければ優先度を下げてよい。過度な高用量は避け、まずは標準量から。",
+   caution:"ホルモン感受性の疾患（前立腺・乳腺など）がある人は避けるか要相談。血糖・血圧に影響する可能性の報告があるため、糖尿病・降圧薬服用中は注意。まれに胃腸不快感。妊活中は自己判断せず専門家へ。"},
+
+  {id:"arg", name:"L-Arginine + L-Ornithine", dose:"1,500〜2,250mg（2〜3粒）", pills:3, time:["morning"],
+   hook:"一酸化窒素（NO）産生を促進して血流を爆上げする“ポンプの燃料”。海綿体・筋肉への血流がグッと高まり、パンプは張り、血管は浮き出て、朝の調子（朝勃ち）もガチッと復活。オルニチンが回復と成長ホルモン分泌をサポートし、トレのキレも一段上へ。飲んだ日は体の“通りの良さ”が違う。",
+   detail:"アルギニンはNO（一酸化窒素）の前駆体で血管を拡張し血流を促す。オルニチンは尿素回路をサポート。NOは陰茎海綿体・骨格筋への血流に直結する。",
+   evidencePos:"メタ分析で、1,500〜5,000mgのアルギニンが勃起機能をプラセボ比で有意に改善したことが示されている——あなたの用量はしっかり有効レンジ内。NOを介した血管拡張・血流改善は生理学的にも確立したメカニズムで、運動時のパンプ・血流感の裏付けになる。シトルリンやPycnogenolと併用するとさらに効率が上がるという報告もあり、“血流系の主役”として実用性が高い。",
+   evidenceNeg:"単独では吸収・血中維持の効率がシトルリンに劣り、体感が弱いという声もある。成長ホルモン分泌促進は高用量・空腹・運動時など条件依存で、日常量での効果は限定的。",
+   reviews:"「トレ前に飲むとパンプ・血管の浮き出しが強い」「朝の調子が改善した」という体感派が多い一方、「単独ではあまり感じない、シトルリン併用で変わった」という声も目立つ。",
+   usage:"血流・パンプ狙いならトレの30〜60分前が効果的（朝トレなら朝でOK）。空腹時の方が吸収が良い。より強いパンプを求めるならL-シトルリン(6〜8g)追加が近年の主流。",
+   caution:"降圧薬・ED治療薬（シルデナフィル等）・他の血管拡張サプリと併用すると血圧が下がりすぎる恐れ。ヘルペス（単純ヘルペス）持ちは再発を促す可能性があり注意。低血圧・最近の心筋梗塞・腎/肝疾患のある人は避けるか要相談。高用量で下痢・胃部不快感。"},
+
+  {id:"zinc", name:"Zinc Glycinate 30mg", dose:"30mg（週5〜6日・1粒）", pills:1, time:["morning"],
+   hook:"精子製造とテストステロン合成の“核心”ミネラル。不足が解消されると精液量が増え、射精の勢い・持続力まで変わってくる。免疫・肌・疲労回復の土台でもあり、汗をかくアスリートほど失いやすい。この一粒が“男の基礎スペック”を静かに、しかし確実に押し上げる。",
+   detail:"テストステロン合成・精子形成・免疫・味覚に必須の必須ミネラル。グリシン酸キレート型は吸収が良く胃に優しい。汗をかくアスリートは失いやすい。",
+   evidencePos:"亜鉛欠乏の人では補給によって総テストステロン・精子数・精子運動率の改善が明確に報告されている。免疫機能・創傷治癒・味覚維持への役割は確立しており、風邪の期間短縮のデータもある。運動で亜鉛を失いやすいトレーニーにとって、欠乏を防ぐこと自体がパフォーマンスとホルモンの土台を守ることに直結する“守りの必須ミネラル”。",
+   evidenceNeg:"充足している人での上乗せ効果は限定的で、飲めば飲むほどテストが上がるものではない。長期・高用量はむしろ銅欠乏を招き逆効果になりうる（これも欠乏補正型）。",
+   reviews:"「風邪をひきにくくなった」「疲労感が減った」という基礎コンディション改善の声が中心。性機能への劇的変化は、もともと欠乏していた人ほど実感しやすい傾向。",
+   usage:"空腹時が吸収は良いが胃が荒れる人は食後に。カルシウム・鉄・食物繊維と同時だと吸収が落ちる。銅対策（無糖ココア or 銅1〜2mg）を忘れずに。週2日は休むのが今の設計通り安全。",
+   caution:"50mg/日以上を数週間続けると銅の吸収を阻害し、銅欠乏（貧血・神経症状=手足のしびれや歩行障害・免疫低下）を招くことがある。今の30mg×週5〜6日＋銅対策は理にかなった設計。空腹時は吐き気が出やすいので体調に合わせる。長期なら時々、亜鉛/銅バランスを血液で確認できると安心。"},
+
+  {id:"thea-d", name:"L-Theanine（日中）", dose:"200〜400mg（1〜2粒）", pills:2, time:["day"],
+   hook:"カフェインと合わせた瞬間、頭が“ゾーン”に入る。ソワソワや動悸は消え、集中は研ぎ澄まされ、クリエイティブな思考が加速する。ストレスに動じない、はつらつとしたクリアな精神状態へ。仕事も勉強もトレも、スイッチひとつで別次元の没入感が手に入る。",
+   detail:"緑茶由来のアミノ酸。α波を増やしリラックスしつつ覚醒を保つ“落ち着いた集中”を作る。カフェインのソワソワ・心拍上昇を打ち消す相棒として有名。",
+   evidencePos:"L-テアニン+カフェインの組み合わせは、注意課題の速度・精度を向上させる二重盲検試験が複数あり、集中系サプリの中では再現性が非常に高い。単独でもα波増加によるリラックス、ストレス・不安の軽減が報告されている。睡眠不足時の選択的注意を改善する高用量試験もあり、“カフェインの相棒”としての地位は確立。安全性も高く常用しやすい。",
+   evidenceNeg:"効果は穏やかで、単独摂取だと「劇的な変化は感じにくい」という人もいる。真価はカフェインとの併用で出るタイプ。",
+   reviews:"「コーヒーのイライラが消えてクリアに集中できる」「仕事・勉強がはかどる」という高評価が多数。ノートロピクス層で定番の組み合わせ。",
+   usage:"カフェイン100mgに対しテアニン200mg（1:2）が黄金比としてよく使われる。仕事・トレ・勉強の開始前に。日中の眠気なく集中したい時に最適。",
+   caution:"安全性は非常に高いが、まれに眠気・頭痛・血圧のわずかな低下。降圧薬を使っている人は念のため様子を見ながら。夕方以降にカフェインと併用すると入眠に影響する場合があるので時間帯に注意。"},
+
+  {id:"bacopa", name:"Bacopa Monnieri", dose:"500〜1,000mg（1〜2粒）", pills:2, time:["day"],
+   hook:"インド伝統の“記憶と精神安定”ハーブ。続けるほど記憶力・認知機能が磨かれ、深い瞑想状態のような落ち着いた集中が育つ。内側から静かに湧き上がるエネルギーと、動じない精神の芯——じっくり効くからこそ、数週間後の自分が変わる長期投資型の一粒だ。",
+   detail:"アーユルヴェーダの伝統ハーブ。バコサイドが神経伝達・シナプス可塑性・抗酸化に働き、記憶と学習をサポートするじっくり効くノートロピック。",
+   evidencePos:"メタ分析で注意・記憶ドメイン、特に情報処理速度の改善が示されている。標準化抽出物（Bacognize/CDRI08など）を用いたRCTで、12週間の継続後に記憶・注意・認知処理の向上が報告された。抗酸化・神経保護作用の基礎研究も豊富で、“長く続ける人ほど恩恵を受ける”タイプの数少ないエビデンス付きノートロピック。ストレス軽減効果を示す試験もある。",
+   evidenceNeg:"効果は緩やかで発現に数週間〜3ヶ月かかり、即効性はゼロに近い。効果を実感できないという声も一定数あり、期待値の設定が重要。",
+   reviews:"「1〜2ヶ月続けたら物覚え・落ち着きが変わった」という継続派の高評価と、「効果がわからない」「お腹が緩くなった」という声が混在。即効を求めると失望しやすい。",
+   usage:"脂溶性成分を含むため食事と一緒に。効果は積み上げ型なので最低8〜12週の継続が前提。胃が弱い人は少量から。",
+   caution:"コリン作動性の作用で胃腸症状（下痢・吐き気・胃もたれ）が出やすい——食後摂取・少量スタートで軽減。甲状腺ホルモン値を上げうるため、甲状腺の薬を飲んでいる人は併用しない/要相談。鎮静系・抗コリン薬との相互作用の可能性にも注意。"},
+
+  {id:"beta", name:"Beta-Alanine", dose:"1,700〜2,550mg（2〜3粒）", pills:3, time:["day"],
+   hook:"筋トレの“あと1〜2回”を生み出す持久力ブースター。筋肉中のカルノシンを増やして疲労の酸性化をブロックし、セット後半でも粘れる。パンプは張り、追い込みの質が段違いに。飲むとピリピリ感が走るが、それは“効いてる合図”。限界の壁を一段ずらす一粒だ。",
+   detail:"筋肉中のカルノシンを増やし、運動中に溜まる水素イオン（酸性化）を緩衝。あと1〜2回の粘りを生む持久力サプリ。飲むと顔や手がピリピリする（パレステジア）が無害。",
+   evidencePos:"1〜10分間持続する高強度運動でのパフォーマンス向上が確立された、強エビデンスの持久力サプリ。3〜6g/日を4週以上でカルノシンが30〜60%増加することが繰り返し示されている。高レップ・インターバル・持久系種目で明確に効き、クレアチンと並ぶ“トレ系の二枚看板”。効果は総摂取量の蓄積で決まるため、毎日コツコツ飲めば誰でも土台が底上げされる。",
+   evidenceNeg:"1分未満の単発の最大筋力（1RM）にはあまり効かない。効果発現に数週間の蓄積が必要で、飲んですぐ変わるものではない。",
+   reviews:"「セット後半の粘りが変わった」「高レップ・インターバル系で明確に効く」という高評価。ピリピリ感を“効いてるサイン”として楽しむ人も。",
+   usage:"タイミングより毎日の継続摂取が重要。ピリピリが苦手なら1回量を分割すると軽減。クレアチンと並ぶトレ系の定番コンボ。",
+   caution:"ピリピリ感（パレステジア）は無害だが、体重1kgあたり40mgを超える一度の大量摂取で強く出やすい——分割摂取で軽減できる。安全性は高いが、しびれ感が苦手なら少量から慣らす。持病・服薬中は念のため相談を。"},
+
+  {id:"gamma", name:"Gamma Oryzanol", dose:"120mg（2粒）", pills:2, time:["day"],
+   hook:"米ぬか由来の植物ステロールで、テストステロンと筋合成を陰から支える“縁の下の力持ち”。自律神経を整えて活力を持続させ、コンボ全体のコンディションを底上げする。派手さはないが、毎日の安定感を作る堅実な一粒だ。",
+   detail:"米ぬか油由来の植物ステロール混合物。自律神経の調整や抗酸化作用が知られ、更年期様症状の緩和などにも使われてきた成分。",
+   evidencePos:"自律神経の調整・抗酸化作用・コレステロール（LDL低下）改善については一定の裏付けがあり、日本でも医薬品成分として使われてきた実績がある。更年期様症状やのぼせ・自律神経の乱れの緩和に用いられ、“体調のベースを整える”役割としての価値がある。",
+   evidenceNeg:"1990年代に筋力・ホルモン増強が謳われたが、質の高いヒト試験は乏しく、テストステロンや筋合成を明確に高める証拠は弱い。トレ効果を主目的にするなら優先度は低め。",
+   reviews:"体感を明確に語るレビューは少なめ。「なんとなく調子が良い」程度の穏やかな声が中心で、劇的な報告は多くない。",
+   usage:"食後に。単体で効果を判断しにくいのでコンボの一員として。優先度は他の強エビデンス組より低めでOK。",
+   caution:"安全性は比較的高いが、まれに眠気・胃部不快感・皮膚症状。ホルモン・コレステロール関連の薬を服用中の人は念のため相談を。米アレルギーがある場合は原料表示を確認。"},
+
+  {id:"mag", name:"Magnesium Glycinate", dose:"300〜400mg（3〜4粒）", pills:4, time:["night"],
+   hook:"夜のリカバリーを司る“回復ミネラル”。筋肉と神経を深く弛緩させ、寝つきと睡眠の深さを一段上へ。夜間のテストステロン分泌をサポートし、朝の目覚めと回復力が別次元に。脚のつり防止や二日酔いのケアにも。飲んだ翌朝、体の軽さで効果を実感できる一粒。",
+   detail:"300以上の酵素反応に関わる必須ミネラル。神経の興奮を鎮めGABA系をサポートして入眠を助ける。グリシン酸型は吸収が良く下痢を起こしにくく、グリシン自体にも安眠作用。",
+   evidencePos:"欠乏補正で睡眠の質(不眠重症度)を改善するRCTがあり、睡眠時間の延長・入眠潜時の短縮を示す試験も。神経・筋機能、血圧、ストレス応答など多方面での役割が確立しており、運動者や欠乏者ではテストステロンとの正の関連も報告されている。グリシン酸型は吸収がよく胃腸に優しく、グリシン自体の安眠作用も加わる“夜のリラックス土台”として優秀。安全域も広い。",
+   evidenceNeg:"すでに充足している人での睡眠改善効果は穏やかで、劇的な入眠剤のような即効性はない。効果は欠乏の程度に依存する。",
+   reviews:"「寝つき・夜中の目覚めが改善した」「朝スッキリ起きられる」「脚のつりが減った」という高評価が多い。体感しやすい睡眠系サプリの定番。",
+   usage:"就寝30〜60分前。飲みすぎ（型により）でお腹が緩くなることがあるが、グリシン酸型は起こしにくい。カルシウムとバランスを取ると◎。",
+   caution:"腎機能が低下している人は体内に蓄積して危険なので必ず医師相談を。過剰摂取で下痢・腹痛（浸透圧性）。抗生物質(一部)・骨粗鬆症薬などの吸収を妨げることがあるので、それらとは2〜3時間ずらす。"},
+
+  {id:"ashwa", name:"Ashwagandha (Sensoril)", dose:"250〜375mg（2〜3粒）", pills:3, time:["night"],
+   hook:"アダプトゲンの“王様”。コルチゾール（ストレスホルモン）を大きく下げ、テストステロンを押し上げる。精神のゆらぎが消えて「何があっても動じない、はつらつとした自分」に。性的活力と睡眠の質が同時に跳ね上がる、心と体を一気に整える最強の夜サプリだ。",
+   detail:"アーユルヴェーダ最強クラスのアダプトゲン。ウィタノリドがストレス応答（HPA軸）を整え、コルチゾールを下げる。Sensoril/KSM-66が標準化抽出物として有名。",
+   evidencePos:"複数のRCTでコルチゾール低下・ストレス/不安の有意な改善が確立され、ハーブ系で最もエビデンスが厚い部類。テストステロンとDHEA-Sがそれぞれ約14〜18%上昇した試験があり、睡眠の質・入眠改善、筋力/回復のサポート、主観的ウェルビーイング向上のデータも揃う。“メンタル・ホルモン・睡眠”を同時に狙える数少ない多機能アダプトゲンで、体感を得やすいのも強み。",
+   evidenceNeg:"効果発現に2〜4週の継続が必要で即効性はない。研究は標準化抽出物(Sensoril/KSM-66)が中心のため、規格の違う安価な製品では同じ効果が出るとは限らない。",
+   reviews:"「イライラ・不安が明確に減った」「睡眠が深くなった」「メンタルが安定して動じなくなった」という高評価が非常に多い。まれに眠気・胃部不快感の声も。",
+   usage:"Sensorilは鎮静寄りなので夜が合う（今の設計通り）。効果発現に2〜4週。長期はサイクル運用が無難。標準化抽出物を選ぶと差が出やすい。",
+   caution:"まれに肝機能障害の報告があり、長期併用では肝機能をチェックすると安心。甲状腺機能を亢進させうるため甲状腺疾患・甲状腺薬服用中は要相談。自己免疫疾患・妊娠中は避ける。鎮静薬・血糖降下薬・降圧薬との相互作用の可能性。高用量で胃腸症状。"},
+
+  {id:"thea-n", name:"L-Theanine（夜）", dose:"200mg（1粒）", pills:1, time:["night"],
+   hook:"マグネシウムと合わせれば“最強のリラックス”。頭の中の考えごとがスッと静まり、深い瞑想のような落ち着きへ誘導。1日の緊張をほどいて、なめらかな入眠と質の高い睡眠へ橋渡しする夜の“オフスイッチ”だ。",
+   detail:"日中と同じテアニンを、夜はマグネシウム・アシュワガンダと組ませてオフスイッチとして使う。過覚醒を鎮めて入眠をなめらかにする役割。",
+   evidencePos:"リラックス・入眠・睡眠の質のサポートを示す報告があり、α波増加による鎮静作用は裏付けがある。反芻思考（寝る前のぐるぐる考え）を静める穏やかな作用で、依存性がなく安全性が非常に高いため常用しやすい。マグネシウムやアシュワガンダと組ませると相乗的に“夜のクールダウン”が決まる。",
+   evidenceNeg:"睡眠薬のような強い催眠作用はなく、あくまで穏やかなリラックス補助。重い不眠には単独では力不足なことがある。",
+   reviews:"「寝る前の考えごとが減って寝つきやすい」「マグネシウムと合わせると相乗で落ち着く」という声。依存性がなく夜ルーティンに入れやすいと好評。",
+   usage:"就寝前にマグネシウムと一緒に。カフェインを夕方摂ってしまった日のリカバリーにも。",
+   caution:"安全性は非常に高いが、まれに眠気の持ち越し・軽い頭痛・血圧のわずかな低下。降圧薬服用中は様子を見ながら。"},
+
+  {id:"saffron", name:"Saffron", dose:"88.5〜177mg（1〜2粒）", pills:2, time:["night"],
+   hook:"世界一高価なスパイスが放つ、気分とリビドーの“灯り”。セロトニン・ドーパミン系に働きかけて心を明るく前向きにし、性的な活力もキープ。1日の終わりに、メンタルを穏やかに満たしてくれる贅沢な一粒だ。",
+   detail:"世界一高価なスパイス。クロシン・サフラナールがセロトニン・ドーパミン系に働き、気分と性機能をサポートするメンタルケアハーブ。",
+   evidencePos:"軽度〜中等度の抑うつ気分の改善を示すRCTが複数あり、気分領域では比較的しっかりしたエビデンスを持つ（一部研究では抗うつ薬に匹敵する改善を報告）。SSRIによる性機能低下の改善や、勃起機能の改善を示した試験もあり、“気分と性機能”を同時にケアできる希少なハーブ。抗酸化作用や食欲・ストレス面への効果を示す研究もある。",
+   evidenceNeg:"性機能への効果は研究数がまだ少なく個人差も大きい。高品質な純サフラン抽出物での試験が中心のため、品質の低い製品では効果が読めない。",
+   reviews:"「気分が明るくなった」「落ち込みが軽くなった」というメンタル系の好評価が中心。性機能への言及もあるが個人差は大きめ。",
+   usage:"夜に気分・リラックス枠として。効果発現に数週間。高品質な純サフラン抽出物を選ぶと差が出やすい。",
+   caution:"純サフランで100mg/日程度までが安全の目安（あなたの量は範囲内）。1.5g/日を超えると毒性リスク。抗うつ薬(SSRI等)と併用すると作用が重なる可能性があるので服薬中は要相談。妊娠中は流産リスクがあり禁忌。血圧・血糖に影響しうるため関連薬服用時は注意。"}
+];
+
+const TIME_META = {
+  morning:{ico:"☀️", label:"朝：起床後30分以内〜朝食後", goal:"目的：テストステロン爆上げ・1日のエネルギー基盤・血流起動"},
+  day:{ico:"⚡", label:"日中：活動中・筋トレ前後", goal:"目的：集中・パフォーマンス・パンプ最大化"},
+  night:{ico:"🌙", label:"夜：就寝1〜2時間前", goal:"目的：回復・テストステロン夜間分泌・深い睡眠・性的活力チャージ"}
+};
+
+const MOTIV = [
+  "さあ、今日も男のポテンシャルを限界まで解放しよう。",
+  "継続は最強のブースター。今日も一粒ずつ確実に。",
+  "昨日の自分を超えていけ。🔥",
+  "土台が整えば、朝のギンギンエネルギーが変わる。",
+  "血流・活力・集中——全部、積み上げの成果だ。💪",
+  "コツコツが結果を作る。今日も抜かりなく。",
+  "最強の男に仕上がっていく。淡々と、確実に。🔥"
+];
+
+/* ===================== STATE ===================== */
+const todayKey = ()=> "log_"+new Date().toISOString().slice(0,10);
+function loadToday(){ return JSON.parse(localStorage.getItem(todayKey())||"{}"); }
+function saveToday(o){ localStorage.setItem(todayKey(), JSON.stringify(o)); }
+function getStock(){ return JSON.parse(localStorage.getItem("stock")||"{}"); }
+function setStock(o){ localStorage.setItem("stock", JSON.stringify(o)); }
+
+function calcStreak(){
+  let s=0; let d=new Date();
+  for(let i=0;i<400;i++){
+    const k="log_"+d.toISOString().slice(0,10);
+    const log=JSON.parse(localStorage.getItem(k)||"{}");
+    const any=Object.values(log).some(v=>v);
+    if(any){ s++; d.setDate(d.getDate()-1); }
+    else{ if(i===0){ d.setDate(d.getDate()-1); continue; } break; }
+  }
+  return s;
+}
+
+/* ===================== RENDER ===================== */
+function renderToday(){
+  const log=loadToday(); const stock=getStock();
+  const c=document.getElementById("todayList"); c.innerHTML="";
+  let total=0, done=0;
+  ["morning","day","night"].forEach(t=>{
+    const items=SUPPS.filter(s=>s.time.includes(t));
+    const m=TIME_META[t];
+    const block=document.createElement("div");
+    block.className="timeblock";
+    block.innerHTML=`<h2><span class="ico">${m.ico}</span>${m.label}</h2>
+      <div class="timegoal">${m.goal}</div>`;
+    items.forEach(s=>{
+      const key=t+"_"+s.id; total++;
+      const isDone=!!log[key]; if(isDone)done++;
+      const st=stock[s.id];
+      let stockHtml="";
+      if(st!==undefined){
+        const low=st<=s.pills*3;
+        stockHtml=`<div class="stock ${low?'low':''}">📦 残り ${st} 粒${low?" ⚠️そろそろ補充":""}</div>`;
+      }
+      const el=document.createElement("div");
+      el.className="item"+(isDone?" done":"");
+      el.innerHTML=`
+        <div class="chk">${isDone?"✔":""}</div>
+        <div class="it-main">
+          <div class="it-name">${s.name}</div>
+          <div class="it-dose">${s.dose}</div>
+          <div class="it-hook">${s.hook}</div>
+          <div class="tapmore">▸ タップで詳細・エビデンス・レビュー・注意点を見る</div>
+          ${stockHtml}
+        </div>`;
+      el.querySelector(".chk").onclick=(e)=>{e.stopPropagation();toggle(key,s);};
+      el.onclick=()=>openSheet(s.id);
+      block.appendChild(el);
+    });
+    c.appendChild(block);
+  });
+  document.getElementById("streakNum").textContent=calcStreak();
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById("todayProg").style.width=pct+"%";
+  document.getElementById("motivMsg").textContent=
+    (done===total&&total>0)?"🎉 今日のスタック完全制覇！最強の一日を。":MOTIV[new Date().getDate()%MOTIV.length];
+}
+
+function toggle(key,s){
+  const log=loadToday(); const stock=getStock();
+  if(!log[key]){
+    log[key]=true;
+    if(stock[s.id]!==undefined) stock[s.id]=Math.max(0,stock[s.id]-s.pills);
+    addMonthAmount(s.id,s.pills);
+  }else{
+    log[key]=false;
+    if(stock[s.id]!==undefined) stock[s.id]+=s.pills;
+    addMonthAmount(s.id,-s.pills);
+  }
+  saveToday(log); setStock(stock); renderToday();
+}
+
+function renderLib(){
+  const c=document.getElementById("libList"); c.innerHTML="";
+  ["morning","day","night"].forEach(t=>{
+    const m=TIME_META[t];
+    const items=SUPPS.filter(s=>s.time.includes(t));
+    const h=document.createElement("div");
+    h.className="timeblock";
+    h.innerHTML=`<h2><span class="ico">${m.ico}</span>${m.label}</h2>
+      <div class="timegoal">${m.goal}</div>`;
+    items.forEach(s=>{
+      const el=document.createElement("div");
+      el.className="item";
+      el.innerHTML=`<div class="it-main">
+        <div class="it-name">${s.name}</div>
+        <div class="it-dose">${s.dose}</div>
+        <div class="it-hook">${s.hook}</div>
+        <div class="tapmore">▸ タップで詳細・エビデンス・レビュー・注意点</div>
+      </div>`;
+      el.onclick=()=>openSheet(s.id);
+      h.appendChild(el);
+    });
+    c.appendChild(h);
+  });
+}
+
+function openSheet(id){
+  const s=SUPPS.find(x=>x.id===id);
+  const stock=getStock();
+  const cur=stock[s.id]!==undefined?stock[s.id]:"—";
+  document.getElementById("sheet").innerHTML=`
+    <span class="close" onclick="closeSheet()">✕</span>
+    <h3>${s.name}</h3>
+    <div class="it-dose">${s.dose} ／ 1回 ${s.pills} 粒</div>
+
+    <div class="hookbox"><span class="tag">🔥 なぜ飲む（気合スイッチ）</span>${s.hook}</div>
+
+    <div class="sec"><h4>これは何？</h4><p>${s.detail}</p></div>
+    <div class="sec"><h4 class="h-pos">✅ エビデンス（前向き）</h4><div class="box pos">${s.evidencePos}</div></div>
+    <div class="sec"><h4 class="h-neg">⚖️ エビデンス（悲観）</h4><div class="box neg">${s.evidenceNeg}</div></div>
+    <div class="sec"><h4>💬 レビュー傾向（ユーザーの声）</h4><div class="box">${s.reviews}</div></div>
+    <div class="sec"><h4>🎯 効かせ方・使い方</h4><div class="box">${s.usage}</div></div>
+    <div class="sec"><h4 class="h-warn">⚠️ 注意点</h4><div class="box warn">${s.caution}</div></div>
+
+    <div class="sec"><h4>📦 在庫（残り粒数）</h4>
+      <div class="stepper">
+        <button onclick="stockAdj('${s.id}',-1)">−</button>
+        <span id="stk_${s.id}">${cur}</span>
+        <button onclick="stockAdj('${s.id}',1)">＋</button>
+        <button onclick="stockAdj('${s.id}',30)" style="width:auto;padding:0 12px;font-size:13px;">+30</button>
+        <button onclick="stockAdj('${s.id}',120)" style="width:auto;padding:0 12px;font-size:13px;">+120</button>
+      </div>
+    </div>`;
+  document.getElementById("modal").classList.add("on");
+}
+function closeSheet(){ document.getElementById("modal").classList.remove("on"); }
+function stockAdj(id,delta){
+  const stock=getStock();
+  let v=stock[id]!==undefined?stock[id]:0;
+  v=Math.max(0,v+delta); stock[id]=v; setStock(stock);
+  const span=document.getElementById("stk_"+id); if(span)span.textContent=v;
+  renderToday(); renderStock();
+}
+
+function renderStock(){
+  const c=document.getElementById("stockList"); c.innerHTML="";
+  const stock=getStock();
+  SUPPS.forEach(s=>{
+    const v=stock[s.id]!==undefined?stock[s.id]:0;
+    const daysLeft=s.pills? Math.floor(v/s.pills):0;
+    const low=v<=s.pills*3;
+    const el=document.createElement("div");
+    el.className="item";
+    el.style.cursor="default";
+    el.innerHTML=`<div class="it-main">
+      <div class="it-name">${s.name}</div>
+      <div class="stock ${low?'low':''}">残り ${v} 粒 ≒ 約 ${daysLeft} 日分${low?" ⚠️補充を":""}</div>
+      <div class="stepper" style="margin-top:8px;">
+        <button onclick="stockAdj('${s.id}',-1)">−</button>
+        <span>${v}</span>
+        <button onclick="stockAdj('${s.id}',1)">＋</button>
+        <button onclick="stockAdj('${s.id}',30)" style="width:auto;padding:0 12px;font-size:13px;">+1瓶(30)</button>
+        <button onclick="stockAdj('${s.id}',120)" style="width:auto;padding:0 12px;font-size:13px;">+120</button>
+      </div>
+    </div>`;
+    c.appendChild(el);
+  });
+}
+
+function monthKey(){ return "amt_"+new Date().toISOString().slice(0,7); }
+function addMonthAmount(id,pills){
+  const k=monthKey();
+  const o=JSON.parse(localStorage.getItem(k)||"{}");
+  o[id]=(o[id]||0)+pills; if(o[id]<0)o[id]=0;
+  localStorage.setItem(k,JSON.stringify(o));
+}
+
+function renderStats(){
+  const ym=new Date().toISOString().slice(0,7);
+  let daysLogged=0, totalPills=0;
+  for(let d=1;d<=31;d++){
+    const dd=String(d).padStart(2,"0");
+    const log=JSON.parse(localStorage.getItem("log_"+ym+"-"+dd)||"{}");
+    if(Object.values(log).some(v=>v))daysLogged++;
+  }
+  const amt=JSON.parse(localStorage.getItem(monthKey())||"{}");
+  Object.values(amt).forEach(v=>totalPills+=v);
+  const streak=calcStreak();
+  const adherence=Math.round(daysLogged/(new Date().getDate())*100)||0;
+
+  document.getElementById("statGrid").innerHTML=`
+    <div class="statcard"><div class="n">${streak}</div><div class="l">🔥 連続日数</div></div>
+    <div class="statcard"><div class="n">${daysLogged}</div><div class="l">今月の記録日数</div></div>
+    <div class="statcard"><div class="n">${adherence}%</div><div class="l">今月の実行率</div></div>
+    <div class="statcard"><div class="n">${totalPills}</div><div class="l">💊 今月の総摂取粒数</div></div>`;
+
+  const ma=document.getElementById("monthAmount"); ma.innerHTML="";
+  SUPPS.forEach(s=>{
+    const p=amt[s.id]||0;
+    if(p>0) ma.innerHTML+=`<div class="listrow"><span>${s.name}</span><b>${p} 粒</b></div>`;
+  });
+  if(!ma.innerHTML)ma.innerHTML='<div class="listrow"><span>まだ記録がありません</span></div>';
+}
+
+function resetToday(){
+  const log=loadToday();
+  Object.keys(log).forEach(key=>{
+    if(log[key]){
+      const id=key.split("_").slice(1).join("_");
+      const s=SUPPS.find(x=>x.id===id);
+      if(s){ const st=getStock(); if(st[id]!==undefined){st[id]+=s.pills;setStock(st);} addMonthAmount(id,-s.pills); }
+    }
+  });
+  saveToday({}); renderToday(); renderStock(); renderStats();
+}
+
+function nav(p,btn){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("on"));
+  document.getElementById("page-"+p).classList.add("on");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  if(p==="stock")renderStock();
+  if(p==="stats")renderStats();
+  if(p==="lib")renderLib();
+  window.scrollTo(0,0);
+}
+
+renderToday(); renderLib();
+</script>
+</body>
+</html>
